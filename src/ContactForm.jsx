@@ -2,11 +2,10 @@ import React,{useEffect, useState,useRef} from 'react'
 import { motion } from 'framer-motion';
 import emailjs from '@emailjs/browser';
 import checkIcon from "../src/assets/check.png"
-// const resend=new Resend("re_9WryH19W_PiGK2JfE57rKDjK5o7XgdQYr")
 const ContactForm = () => {
     const form = useRef();
+   const [isSubmiting,setIsSubmiting]=useState(false)
    const [isApplicatedSent,setIsApplicationSent]=useState(false)
-    // useEffect(() => emailjs.init("IglxKjApNUagHGcdh"), []);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -22,8 +21,8 @@ const ContactForm = () => {
   };
   
   const handleSubmit =async  (event) => {
-    console.log("event",event)
     event.preventDefault();
+   setIsSubmiting(true)
     const myForm=event.target;
     if (Object.values(formData).some(value=>value==="")){
       setShowError(true)
@@ -34,17 +33,7 @@ const ContactForm = () => {
     }
 
 
-    // try{
-
-    //     await resend.emails.send({
-    //         from:"user@email.com",
-    //         to:"bghanbi50@gmail.com",
-    //         subject:"New Joining the team request",
-    //         react:<NewMembreEmailTemplate name={formData.name} email={formData.email}/>
-    //     })
-    // }catch(e){
-    //     console.log("error",e.message)
-    // }
+    
     
 
     // sending the email
@@ -56,13 +45,15 @@ const ContactForm = () => {
       () => {
         console.log('SUCCESS!');
         setIsApplicationSent(true)
-        // window.location.href = '/thank-you';
 
       },
       (error) => {
-        console.log('FAILED...', error);
+        setShowError(error)
+        
       },
-    );
+    ).finally(()=>{
+     setIsSubmiting(false)
+    })
   };
 
   useEffect(()=>{
@@ -105,7 +96,10 @@ const ContactForm = () => {
 
         <br />
      
-      <motion.button  whileHover={{ scale: 1.1 }} className='text-white  submitForm ' type="submit">Join the team</motion.button>
+      <motion.button  whileHover={{ scale: 1.1 }} className='text-white  submitForm ' type="submit">
+        { !isSubmiting && <span>Join the team </span>}
+        {isSubmiting && <span>Sending Request ...</span>}
+       </motion.button>
       
 
     </form> 
