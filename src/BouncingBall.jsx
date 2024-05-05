@@ -12,7 +12,7 @@ const BouncingBall = () => {
 
 
 
-    <div className=" mx-auto h-10 bouncingallWrraper  border-white">
+    <div className=" mx-auto mt-10 h-10 bouncingallWrraper  border-white">
       <div ref={ballRef} className="ball" />
   </div>
   )

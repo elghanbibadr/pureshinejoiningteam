@@ -1,12 +1,16 @@
-import React,{useEffect, useState} from 'react'
+import React,{useEffect, useState,useRef} from 'react'
 import { motion } from 'framer-motion';
-
+import emailjs from '@emailjs/browser';
+import checkIcon from "../src/assets/check.png"
+// const resend=new Resend("re_9WryH19W_PiGK2JfE57rKDjK5o7XgdQYr")
 const ContactForm = () => {
+    const form = useRef();
+   const [isApplicatedSent,setIsApplicationSent]=useState(false)
+    // useEffect(() => emailjs.init("IglxKjApNUagHGcdh"), []);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    subject: "",
-    message: "",
+    phoneNumber: "",
   });
   const [showError,setShowError]=useState(false)
 
@@ -17,7 +21,8 @@ const ContactForm = () => {
     });
   };
   
-  const handleSubmit = (event) => {
+  const handleSubmit =async  (event) => {
+    console.log("event",event)
     event.preventDefault();
     const myForm=event.target;
     if (Object.values(formData).some(value=>value==="")){
@@ -25,8 +30,39 @@ const ContactForm = () => {
       return;
     }else{
       setShowError(false)
-      myForm.submit();
+      // myForm.submit();
     }
+
+
+    // try{
+
+    //     await resend.emails.send({
+    //         from:"user@email.com",
+    //         to:"bghanbi50@gmail.com",
+    //         subject:"New Joining the team request",
+    //         react:<NewMembreEmailTemplate name={formData.name} email={formData.email}/>
+    //     })
+    // }catch(e){
+    //     console.log("error",e.message)
+    // }
+    
+
+    // sending the email
+    emailjs
+    .sendForm('service_klj723p', 'template_ljxkuls',form.current, {
+      publicKey: 'IglxKjApNUagHGcdh',
+    })
+    .then(
+      () => {
+        console.log('SUCCESS!');
+        setIsApplicationSent(true)
+        // window.location.href = '/thank-you';
+
+      },
+      (error) => {
+        console.log('FAILED...', error);
+      },
+    );
   };
 
   useEffect(()=>{
@@ -37,8 +73,10 @@ const ContactForm = () => {
 
   return (
     <section id='contact' className='md:w-3/4 mx-auto text-center' >
-      <h2 className='text-white mb-10  text-xl md:text-3xl'>Contact Me</h2>
-    <form  action="https://formsubmit.co/bghanbi50@gmail.com" method="POST" onSubmit={handleSubmit}>
+     { !isApplicatedSent && <>
+     
+      <h2 className='text-white mb-10  text-xl md:text-3xl'>Lets Grab Your Info!</h2>
+    <form ref={form}    onSubmit={handleSubmit}>
         <input
           type="text"
           name="name"
@@ -58,21 +96,16 @@ const ContactForm = () => {
         />
       <br />
         <input
-          type="text"
-          name="subject"
-          value={formData.subject}
+          type="number"
+          name="phoneNumber"
+          value={formData.phoneNumber}
           onChange={handleChange}
-          placeholder='Subject'
+          placeholder='phoneNumber'
         />
-      <br />
-        <textarea
-          name="message"
-          value={formData.message}
-          onChange={handleChange}
-          placeholder='Write Message'
-        />
-      <br />
-      <motion.button  whileHover={{ scale: 1.1 }} className='text-white px-20 submitForm' type="submit">Submit</motion.button>
+
+        <br />
+     
+      <motion.button  whileHover={{ scale: 1.1 }} className='text-white  submitForm ' type="submit">Join the team</motion.button>
       
 
     </form> 
@@ -89,6 +122,13 @@ const ContactForm = () => {
     </div>}
       
       </motion.div>
+     </> 
+}
+    {isApplicatedSent &&  <div className=' py-10 w-[90%] md:w-[70%] items-center flex flex-col justify-center mx-auto p-6 thankyou text-center'>
+        <h1 className='text-3xl text-white'>Thank you for your request </h1>
+        <p className='my-4'>our team we'll review your request and reach out to you soon !</p>
+       <img className='h-14 w-14 ' src={checkIcon} alt="check icon" />
+      </div>}
     </section>
   )
 }
